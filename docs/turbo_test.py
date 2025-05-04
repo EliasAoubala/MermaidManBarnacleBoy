@@ -1,9 +1,10 @@
 from turborocket.meanline.meanline_relations import TurbineStageDesign
-from turborocket.fluids.ideal_gas import IdealFluid
+
+from turborocket.fluids.fluids import IdealGas
 
 import json
 
-fluid = IdealFluid(p=37.9e5, t=889, R=258, gamma=1.108, cp=2640)
+fluid = IdealGas(p=37.9e5, t=889, R=258, gamma=1.108, cp=2640)
 
 stage = TurbineStageDesign(gas=fluid, m_dot=3.24, omega=20000, alpha=20)
 
