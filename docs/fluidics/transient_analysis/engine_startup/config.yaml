@@ -3,13 +3,13 @@
 SIMULATION:
 
   t_start:  0.0       # Simulation Start Time (s)
-  t_stop:   20      # Simulation Stop Time (s)
+  t_stop:   60         # Simulation Stop Time (s)
   dt_fix:   0.05      # Fixed Timestep (s)
   dt_init:  1.0e-6    # Initial Timestep (s)
 
   max_dp:   0.1e+5   # Maximum Pressure Increment for adaptive timesteping (s)  
 
-  alpha:    0.02       # Low Frequency Damping Parameter (n.d)
+  alpha:    0.01       # Low Frequency Damping Parameter (n.d)
     
 
 #################################################### System Sizing ####################################################
@@ -20,22 +20,22 @@ SIZING:
     
     # Combustion Chamber Pressure
 
-    P_cc:             30.0e+5   # Nominal Chamber Pressure (Pa)
+    P_cc:             25.0e+5   # Nominal Chamber Pressure (Pa)
     P_init:           1.0e+5    # Initial Chamber Pressure (Pa)
 
     # Injector Conditions
 
     P_inj_ox:         50.0e+5   # Nominal Oxidiser Injector Pressure (Pa)
     P_inj_ox_init:    1.0e+5    # Initial Oxidiser Injector Presusre (Pa)
-    Cd_o:             0.6       # Oxidiser Injector Discharge Coefficient (n.d)
+    Cd_o:             0.5       # Oxidiser Injector Discharge Coefficient (n.d)
 
     P_inj_fu:         50.0e+5   # Nominal Fuel Injector Pressure (Pa)
     P_inj_fu_init:    1.0e+5    # Initial Fuel Injector Presusre (Pa)
-    Cd_f:             0.6       # Fuel Injector Discharge Coefficient (n.d)
+    Cd_f:             0.4       # Fuel Injector Discharge Coefficient (n.d)
 
     # Engine Sizing
 
-    m_dot:            50.0e-3   # Nominal Mass Flow Rate of Engine (kg/s)
+    m_dot:            38.655e-3 # Nominal Mass Flow Rate of Engine (kg/s)
     MR:               1         # Nominal Mixture Ratio of Engine (n.d)
     
     # Engine Parameters
@@ -97,21 +97,21 @@ VALVES:
     s_pos_init:   0
 
   GG_MFV:
-    Name: "Gas Generator Main Fuel Valve"
+    Name:         "Gas Generator Main Fuel Valve"
     OD:           4.0e-3
     Cd:           0.6
     Tau:          150.0e-3
     s_pos_init:   0
 
   ME_MOV:
-    Name: "Main Engine Main Oxidiser Valve"
+    Name:         "Main Engine Main Oxidiser Valve"
     OD:           4.0e-3
     Cd:           0.6
     Tau:          150.0e-3
     s_pos_init:   0
 
   ME_MFV:
-    Name: "Main Engine Main Fuel Valve"
+    Name:         "Main Engine Main Fuel Valve"
     OD:           4.0e-3
     Cd:           0.6
     Tau:          150.0e-3
@@ -127,33 +127,33 @@ TURBOPUMPS:
     FUEL_PUMP:
       
       type:     "Pump"
-      D_nom:    2.0e-2      # Pump Nominal Diameter (m)
-      Q_nom:    0.01       # Pump Nominal Design Volumetric Flow Rate (m^3/s)
-      eta_nom:  0.4         # Pump Nominal Design Efficiency (%)
+      D_nom:    46.57e-3    # Pump Nominal Diameter (m)
+      Q_nom:    2.7e-4      # Pump Nominal Design Volumetric Flow Rate (m^3/s)
+      eta_nom:  0.18        # Pump Nominal Design Efficiency (%)
 
     FUEL_TURBINE:
       
       type:     "Turbine"
-      delta_b:  140         # Turbine Nominal Deflection Angle (Degrees)
-      a_rat:    2           # Turbine Area Ratio (A_2/A_1)
-      D_m:      20.0e-2     # Turbine Mean Diameter (m)
-      eta:      0.4         # Turbine Derived Efficiency (%)
+      delta_b:  132         # Turbine Nominal Deflection Angle (Degrees)
+      a_rat:    4.11        # Turbine Area Ratio (A_2/A_1)
+      D_m:      0.147       # Turbine Mean Diameter (m)
+      eta:      0.28        # Turbine Derived Efficiency (%)
 
     SYSTEM:
       
-      N_nom:  20.0e+3       # Turbopump Nominal Rotational Speed (RPM)
-      I:      0.001         # Turbopump Polar Moment of Inertia (kg  m^2)
+      N_nom:  24.0e+3       # Turbopump Nominal Rotational Speed (RPM)
+      I:      0.00698       # Turbopump Polar Moment of Inertia (kg  m^2)
       N_init: 0             # Turbopump Initial Rotational Rate (RPM)
 
 SEQUENCE:
   
-  GG_MFV: [[0, 20]]         # Gas Generator Main Fuel Valve Sequence
+  GG_MFV: [[0, 60]]         # Gas Generator Main Fuel Valve Sequence
     
-  GG_MOV: [[0, 20]]         # Gas Generator Main Oxidiser Valve Sequence
+  GG_MOV: [[0, 60]]         # Gas Generator Main Oxidiser Valve Sequence
     
-  ME_MFV: [[10, 20]]        # Main Engine Main Fuel Valve Sequence
+  ME_MFV: [[60, 70]]        # Main Engine Main Fuel Valve Sequence
     
-  ME_MOV: [[10, 20]]        # Main Engine Main Oxidiser Valve Sequence
+  ME_MOV: [[60, 70]]        # Main Engine Main Oxidiser Valve Sequence
 
 
 
