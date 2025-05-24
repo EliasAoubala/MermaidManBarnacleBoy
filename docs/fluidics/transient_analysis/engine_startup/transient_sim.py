@@ -39,6 +39,11 @@ GG = GasGenerator(
     MR=loader._engines["GAS_GENERATOR"]._MR,
 )
 
+comb = pathlib.Path(__file__).parent.resolve().joinpath("n2o_ipa.yaml")
+look_up = pathlib.Path(__file__).parent.resolve().joinpath("combustion_date.csv")
+
+GG.comb_object(look_up=True, combustion_file=str(comb), look_up_file=look_up)
+
 GG.injector_cond(
     ox_in=gg_inj_ox,
     fu_in=gg_inj_fu,
@@ -71,6 +76,9 @@ ME = MainEngine(
     Pcc=loader._engines["MAIN_ENGINE"]._P_cc,
     MR=loader._engines["MAIN_ENGINE"]._MR,
 )
+
+
+ME.comb_object(look_up=True, combustion_file=str(comb), look_up_file=look_up)
 
 ME.injector_cond(
     ox_in=me_inj_ox,
@@ -158,17 +166,23 @@ inj_fu_me = Cavity(
 #################################### Pump and Turbine Instantiaton #####################################
 
 pump = Pump(
-    D=loader._turbo_pumps["MERMAID_MAN"]["Pumps"]["FUEL_PUMP"]._D_nom,
-    Q_nom=loader._turbo_pumps["MERMAID_MAN"]["Pumps"]["FUEL_PUMP"]._Q_nom,
-    eta_nom=loader._turbo_pumps["MERMAID_MAN"]["Pumps"]["FUEL_PUMP"]._eta_nom,
-    N_nom=loader._turbo_pumps["MERMAID_MAN"]["N_nom"],
+    D_1=loader._turbo_pumps["MERMAID_MAN"]["Pumps"]["FUEL_PUMP"]._D_1,
+    D_2=loader._turbo_pumps["MERMAID_MAN"]["Pumps"]["FUEL_PUMP"]._D_2,
+    D_3=loader._turbo_pumps["MERMAID_MAN"]["Pumps"]["FUEL_PUMP"]._D_3,
+)
+
+pump.set_performance(
+    C_c=loader._turbo_pumps["MERMAID_MAN"]["Pumps"]["FUEL_PUMP"]._C_c,
+    psi=loader._turbo_pumps["MERMAID_MAN"]["Pumps"]["FUEL_PUMP"]._psi,
+    eta_bep=loader._turbo_pumps["MERMAID_MAN"]["Pumps"]["FUEL_PUMP"]._eta_bep,
+    N_nom=loader._turbo_pumps["MERMAID_MAN"]["Pumps"]["FUEL_PUMP"]._N_bep,
 )
 
 turbine = Turbine(
-    delta_b=loader._turbo_pumps["MERMAID_MAN"]["Turbines"]["FUEL_TURBINE"]._delta_b,
+    u_co_nom=loader._turbo_pumps["MERMAID_MAN"]["Turbines"]["FUEL_TURBINE"]._u_co_nom,
     a_rat=loader._turbo_pumps["MERMAID_MAN"]["Turbines"]["FUEL_TURBINE"]._a_rat,
     D_m=loader._turbo_pumps["MERMAID_MAN"]["Turbines"]["FUEL_TURBINE"]._D_m,
-    eta=loader._turbo_pumps["MERMAID_MAN"]["Turbines"]["FUEL_TURBINE"]._eta,
+    eta_nom=loader._turbo_pumps["MERMAID_MAN"]["Turbines"]["FUEL_TURBINE"]._eta_nom,
 )
 
 
@@ -221,7 +235,7 @@ t_array = [t_init]
 # ---------- PUMP ----------
 N_pump_array = [N]
 p_pump_array = [pump.get_exit_condition(inlet=fu_deliver, N=N, m_dot=0).get_pressure()]
-eta_pump_array = [pump.get_eta(Q=0, N=N)]
+eta_pump_array = [pump.get_eta(Q=0, N=N, fluid=fu_deliver)]
 tau_pump_array = [tau_pump]
 
 # ---------- Turbine --------
@@ -293,7 +307,7 @@ while t_array[-1] < t_stop:
     pump_exit = pump.get_exit_condition(
         inlet=fu_deliver, N=N, m_dot=(m_dot_gg_mfv + m_dot_me_mfv)
     )
-    pump_t = pump.get_torque(inlet=fu_deliver, N=N, m_dot=(m_dot_gg_mfv + m_dot_me_mfv))
+    pump_t = pump.get_torque(inlet=fu_deliver, N=N)
 
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Evaluating for Valve M_dot ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 
@@ -347,14 +361,8 @@ while t_array[-1] < t_stop:
 
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Updating Turbine Performance ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 
-    R_gas = gg_dic["Cp"] * (gg_dic["gamma"] - 1) / gg_dic["gamma"]
-
     turbine_t = gg_dic["m_dot_t"] * turbine.get_torque(
-        T_o=gg_dic["T_o"],
-        P_o=gg_dic["P_cc"],
-        gamma=gg_dic["gamma"],
-        R=R_gas,
-        P_exit=P_exit,
+        combustion_gas=gg_dic["gas_obj"], P_exit=1e5, N=N
     )
 
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Logging Data from the Curent Timestep ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
@@ -363,7 +371,11 @@ while t_array[-1] < t_stop:
     N_pump_array.append(N)
     p_pump_array.append(pump_exit.get_pressure())
     eta_pump_array.append(
-        pump.get_eta(Q=(m_dot_gg_mfv + m_dot_me_mfv) / fu_deliver.get_density(), N=N)
+        pump.get_eta(
+            Q=(m_dot_gg_mfv + m_dot_me_mfv) / fu_deliver.get_density(),
+            N=N,
+            fluid=fu_deliver,
+        )
     )
     tau_pump_array.append(pump_t)
 
@@ -503,7 +515,7 @@ fig.set_size_inches(18.5, 10.5)
 fig.suptitle("TPA + Valve + Injector")
 
 # Pump and Turbine Torques
-ax[0][0].plot(df["t"], df["tau_turbine"], label="Turbine Torque")
+# ax[0][0].plot(df["t"], df["tau_turbine"], label="Turbine Torque")
 ax[0][0].plot(df["t"], df["tau_pump"], label="Pump Torque")
 ax[0][0].set_ylabel("Torque (Nm)")
 ax[0][0].legend()

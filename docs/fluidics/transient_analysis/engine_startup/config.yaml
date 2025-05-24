@@ -3,7 +3,7 @@
 SIMULATION:
 
   t_start:  0.0       # Simulation Start Time (s)
-  t_stop:   60         # Simulation Stop Time (s)
+  t_stop:   5         # Simulation Stop Time (s)
   dt_fix:   0.05      # Fixed Timestep (s)
   dt_init:  1.0e-6    # Initial Timestep (s)
 
@@ -127,23 +127,27 @@ TURBOPUMPS:
     FUEL_PUMP:
       
       type:     "Pump"
-      D_nom:    46.57e-3    # Pump Nominal Diameter (m)
-      Q_nom:    2.7e-4      # Pump Nominal Design Volumetric Flow Rate (m^3/s)
-      eta_nom:  0.18        # Pump Nominal Design Efficiency (%)
+      D_1:      14.89e-3    # Impeller Eye Diameter (m)  
+      D_2:      54.31e-3    # Impeller Outer Diameter (m)
+      D_3:      2.6e-3      # Diffuser Throat Diameter (m)
+      C_c:      0.8         # Blockage factor for flow Vena-contra (n.d)
+      psi:      1         # Pressure Factor for Pump (proxy of slip factor)
+      eta_bep:  0.28        # Best Efficiency Point (%)
+      N_bep:    24.0e+3     # Best Efficiency Point Rotational Speed (RPM)
 
     FUEL_TURBINE:
       
       type:     "Turbine"
-      delta_b:  132         # Turbine Nominal Deflection Angle (Degrees)
+      u_co_nom: 0.13        # Turbine Nominal Deflection Angle (Degrees)
       a_rat:    4.11        # Turbine Area Ratio (A_2/A_1)
       D_m:      0.147       # Turbine Mean Diameter (m)
-      eta:      0.28        # Turbine Derived Efficiency (%)
+      eta_nom:  0.28        # Turbine Derived Efficiency (%)
 
     SYSTEM:
       
       N_nom:  24.0e+3       # Turbopump Nominal Rotational Speed (RPM)
       I:      0.00698       # Turbopump Polar Moment of Inertia (kg  m^2)
-      N_init: 0             # Turbopump Initial Rotational Rate (RPM)
+      N_init: 0.1           # Turbopump Initial Rotational Rate (RPM)
 
 SEQUENCE:
   
@@ -169,7 +173,7 @@ PROPELLANTS:
 
   Fuel:
   
-    Name:             "Isopropanol"
+    Name:             "C3H8O,2propanol"
     Density:          785       # Propellant Density (kg/m^3)
     Compressibility:  9.0e+8    # Propellant Bulk Modulus (Pa)
     P_deliver:        30.0e+5   # Propellant Delivery Pressure From Test House (Pa)
